@@ -1,0 +1,38 @@
+
+name: Python Calculator Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run unit tests
+        run: python -m unittest -v test_calculator
+
+      - name: Package calculator source
+        run: |
+          mkdir -p dist
+          zip dist/python-calculator.zip \
+            calculator.py test_calculator.py README.md
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-calculator
+          path: dist/python-calculator.zip
